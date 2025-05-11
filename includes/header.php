@@ -28,12 +28,29 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="dashboard.php">
-                            <i class="fas fa-chart-line me-1"></i> Dashboard
+                            <i class="fas fa-chart-line me-2"></i>Dashboard
                         </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-file-alt me-2"></i>Reports
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
+                            <li>
+                                <a class="dropdown-item" href="generate_report.php?type=weekly">
+                                    <i class="fas fa-calendar-week me-2"></i>Weekly Report
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="generate_report.php?type=monthly">
+                                    <i class="fas fa-calendar-alt me-2"></i>Monthly Report
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="logout.php">
-                            <i class="fas fa-sign-out-alt me-1"></i> Logout
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
                         </a>
                     </li>
                 </ul>

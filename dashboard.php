@@ -167,18 +167,13 @@ mysqli_close($conn);
                                 </div>
                             </div>
                         </div>
+                        <!-- Reports Card -->
                         <div class="col-md-3">
                             <div class="card bg-primary text-white">
                                 <div class="card-body">
                                     <h5 class="card-title">Reports</h5>
-                                    <div class="d-grid gap-2">
-                                        <a href="generate_report.php?type=weekly" class="btn btn-light btn-sm">
-                                            <i class="fas fa-calendar-week me-2"></i>Weekly Report
-                                        </a>
-                                        <a href="generate_report.php?type=monthly" class="btn btn-light btn-sm">
-                                            <i class="fas fa-calendar-alt me-2"></i>Monthly Report
-                                        </a>
-                                    </div>
+                                    <p class="card-text">View your financial reports</p>
+                                    <p class="mb-0">Access weekly and monthly reports from the navigation menu</p>
                                 </div>
                             </div>
                         </div>
