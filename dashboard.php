@@ -113,6 +113,20 @@ $totals = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 $sql = "SELECT * FROM categories ORDER BY type, name";
 $categories = mysqli_query($conn, $sql);
 
+// Get loans
+$sql = "SELECT * FROM loans WHERE user_id = ? AND status = 'active' ORDER BY created_at DESC";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_execute($stmt);
+$loans = mysqli_stmt_get_result($stmt);
+
+// Get debts
+$sql = "SELECT * FROM debts WHERE user_id = ? AND status = 'active' ORDER BY created_at DESC";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_execute($stmt);
+$debts = mysqli_stmt_get_result($stmt);
+
 mysqli_close($conn);
 ?>
 
@@ -166,6 +180,185 @@ mysqli_close($conn);
                                         </a>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loan and Debt Management -->
+                    <div class="row mb-4">
+                        <!-- Loans Section -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Active Loans</h5>
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addLoanModal" data-bs-backdrop="static">
+                                        <i class="fas fa-plus me-2"></i>Add Loan
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Amount</th>
+                                                    <th>Monthly Payment</th>
+                                                    <th>Remaining</th>
+                                                    <th>End Date</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php 
+                                                if(mysqli_num_rows($loans) > 0) {
+                                                    while($loan = mysqli_fetch_assoc($loans)) { 
+                                                ?>
+                                                    <tr>
+                                                        <td>৳<?php echo number_format($loan['loan_amount'], 2); ?></td>
+                                                        <td>৳<?php echo number_format($loan['payment_per_month'], 2); ?></td>
+                                                        <td>৳<?php echo number_format($loan['remaining_amount'], 2); ?></td>
+                                                        <td><?php echo date('M d, Y', strtotime($loan['end_date'])); ?></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary" onclick="makeLoanPayment(<?php echo $loan['id']; ?>)">
+                                                                <i class="fas fa-money-bill-wave"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                <?php 
+                                                    }
+                                                } else {
+                                                ?>
+                                                    <tr>
+                                                        <td colspan="5" class="text-center">No active loans found</td>
+                                                    </tr>
+                                                <?php } ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Debts Section -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Active Debts</h5>
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addDebtModal" data-bs-backdrop="static">
+                                        <i class="fas fa-plus me-2"></i>Add Debt
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Amount</th>
+                                                    <th>Remaining</th>
+                                                    <th>Due Date</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php 
+                                                if(mysqli_num_rows($debts) > 0) {
+                                                    while($debt = mysqli_fetch_assoc($debts)) { 
+                                                ?>
+                                                    <tr>
+                                                        <td>৳<?php echo number_format($debt['debt_amount'], 2); ?></td>
+                                                        <td>৳<?php echo number_format($debt['remaining_amount'], 2); ?></td>
+                                                        <td><?php echo date('M d, Y', strtotime($debt['due_date'])); ?></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary" onclick="makeDebtPayment(<?php echo $debt['id']; ?>)">
+                                                                <i class="fas fa-money-bill-wave"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                <?php 
+                                                    }
+                                                } else {
+                                                ?>
+                                                    <tr>
+                                                        <td colspan="4" class="text-center">No active debts found</td>
+                                                    </tr>
+                                                <?php } ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Loan Modal -->
+                    <div class="modal fade" id="addLoanModal" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Add New Loan</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form method="POST" action="manage_loan_debt.php">
+                                    <div class="modal-body">
+                                        <input type="hidden" name="action" value="add_loan">
+                                        <div class="mb-3">
+                                            <label class="form-label">Loan Amount</label>
+                                            <input type="number" step="0.01" name="loan_amount" class="form-control" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Monthly Payment</label>
+                                            <input type="number" step="0.01" name="payment_per_month" class="form-control" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Start Date</label>
+                                            <input type="date" name="start_date" class="form-control" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">End Date</label>
+                                            <input type="date" name="end_date" class="form-control" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Description</label>
+                                            <textarea name="description" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Add Loan</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Debt Modal -->
+                    <div class="modal fade" id="addDebtModal" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Add New Debt</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form method="POST" action="manage_loan_debt.php">
+                                    <div class="modal-body">
+                                        <input type="hidden" name="action" value="add_debt">
+                                        <div class="mb-3">
+                                            <label class="form-label">Debt Amount</label>
+                                            <input type="number" step="0.01" name="debt_amount" class="form-control" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Due Date</label>
+                                            <input type="date" name="due_date" class="form-control" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Description</label>
+                                            <textarea name="description" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Add Debt</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -323,6 +516,16 @@ mysqli_close($conn);
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Initialize Bootstrap modals
+    var loanModal = new bootstrap.Modal(document.getElementById('addLoanModal'));
+    var debtModal = new bootstrap.Modal(document.getElementById('addDebtModal'));
+
     // Edit button click handler
     document.querySelectorAll('.edit-btn').forEach(button => {
         button.addEventListener('click', function() {
@@ -347,7 +550,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const row = this.closest('tr');
             const form = document.getElementById('editTransactionForm');
             
-            // Get values from edit mode inputs
             form.querySelector('#edit_transaction_id').value = row.dataset.transactionId;
             form.querySelector('#edit_amount').value = row.querySelector('.edit-mode[type="number"]').value;
             form.querySelector('#edit_category_id').value = row.querySelector('.edit-mode[type="select"]').value;
@@ -355,11 +557,78 @@ document.addEventListener('DOMContentLoaded', function() {
             form.querySelector('#edit_transaction_date').value = row.querySelector('.edit-mode[type="date"]').value;
             form.querySelector('#edit_type').value = row.querySelector('.edit-mode[type="select"]:last-child').value;
             
-            // Submit the form
             form.submit();
         });
     });
+
+    // Auto-hide alerts after 5 seconds
+    setTimeout(function() {
+        document.querySelectorAll('.alert').forEach(function(alert) {
+            var bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
 });
+
+function makeLoanPayment(loanId) {
+    const amount = prompt("Enter payment amount:");
+    if (amount !== null && !isNaN(amount) && amount > 0) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'manage_loan_debt.php';
+        
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'make_loan_payment';
+        
+        const loanIdInput = document.createElement('input');
+        loanIdInput.type = 'hidden';
+        loanIdInput.name = 'loan_id';
+        loanIdInput.value = loanId;
+        
+        const amountInput = document.createElement('input');
+        amountInput.type = 'hidden';
+        amountInput.name = 'payment_amount';
+        amountInput.value = amount;
+        
+        form.appendChild(actionInput);
+        form.appendChild(loanIdInput);
+        form.appendChild(amountInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function makeDebtPayment(debtId) {
+    const amount = prompt("Enter payment amount:");
+    if (amount !== null && !isNaN(amount) && amount > 0) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'manage_loan_debt.php';
+        
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'make_debt_payment';
+        
+        const debtIdInput = document.createElement('input');
+        debtIdInput.type = 'hidden';
+        debtIdInput.name = 'debt_id';
+        debtIdInput.value = debtId;
+        
+        const amountInput = document.createElement('input');
+        amountInput.type = 'hidden';
+        amountInput.name = 'payment_amount';
+        amountInput.value = amount;
+        
+        form.appendChild(actionInput);
+        form.appendChild(debtIdInput);
+        form.appendChild(amountInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
 </script>
 
 <?php

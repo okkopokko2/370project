@@ -39,6 +39,21 @@ mysqli_stmt_bind_param($stmt, "iss", $user_id, $start_date, $end_date);
 mysqli_stmt_execute($stmt);
 $totals = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
+// Get loan payments for the period
+$sql = "SELECT 
+            SUM(loan_amount - remaining_amount) as total_loan_paid,
+            SUM(loan_amount / TIMESTAMPDIFF(MONTH, start_date, end_date)) as total_monthly_payment,
+            COUNT(*) as loan_count
+        FROM loans 
+        WHERE user_id = ? 
+        AND status = 'active'
+        AND start_date <= ?
+        AND end_date >= ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "iss", $user_id, $end_date, $start_date);
+mysqli_stmt_execute($stmt);
+$loan_totals = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+
 // Get expenses by category
 $sql = "SELECT 
             c.name as category_name,
@@ -88,14 +103,41 @@ mysqli_close($conn);
                     </div>
                 </div>
                 <div class="card-body">
-                    <!-- Summary Card -->
+                    <!-- Summary Cards -->
                     <div class="row mb-4">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="card bg-danger text-white">
                                 <div class="card-body">
                                     <h5 class="card-title">Total Expenses</h5>
                                     <h3 class="card-text">৳<?php echo number_format($totals['total_expense'] ?? 0, 2); ?></h3>
                                     <p class="mb-0"><?php echo $totals['transaction_count'] ?? 0; ?> transactions</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Loan Payments</h5>
+                                    <h3 class="card-text">৳<?php echo number_format($loan_totals['total_loan_paid'] ?? 0, 2); ?></h3>
+                                    <p class="mb-0"><?php echo $loan_totals['loan_count'] ?? 0; ?> active loans</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Monthly Loan Payment</h5>
+                                    <h3 class="card-text">৳<?php echo number_format($loan_totals['total_monthly_payment'] ?? 0, 2); ?></h3>
+                                    <p class="mb-0">Due this month</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Expenses with Loans</h5>
+                                    <h3 class="card-text">৳<?php echo number_format(($totals['total_expense'] ?? 0) + ($loan_totals['total_monthly_payment'] ?? 0), 2); ?></h3>
+                                    <p class="mb-0">Including monthly payments</p>
                                 </div>
                             </div>
                         </div>
@@ -119,8 +161,8 @@ mysqli_close($conn);
                                     </thead>
                                     <tbody>
                                         <?php while($category = mysqli_fetch_assoc($category_expenses)) { 
-                                            $percentage = ($totals['total_expense'] > 0) ? 
-                                                ($category['total_amount'] / $totals['total_expense'] * 100) : 0;
+                                            $percentage = (($totals['total_expense'] ?? 0) + ($loan_totals['total_monthly_payment'] ?? 0) > 0) ? 
+                                                ($category['total_amount'] / (($totals['total_expense'] ?? 0) + ($loan_totals['total_monthly_payment'] ?? 0)) * 100) : 0;
                                         ?>
                                             <tr>
                                                 <td><?php echo htmlspecialchars($category['category_name']); ?></td>
@@ -135,6 +177,25 @@ mysqli_close($conn);
                                                              aria-valuemin="0" 
                                                              aria-valuemax="100">
                                                             <?php echo number_format($percentage, 1); ?>%
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php } ?>
+                                        <?php if($loan_totals['total_monthly_payment'] > 0) { ?>
+                                            <tr>
+                                                <td>Monthly Loan Payments</td>
+                                                <td>৳<?php echo number_format($loan_totals['total_monthly_payment'], 2); ?></td>
+                                                <td><?php echo $loan_totals['loan_count']; ?></td>
+                                                <td>
+                                                    <div class="progress" style="height: 20px;">
+                                                        <div class="progress-bar bg-warning" 
+                                                             role="progressbar" 
+                                                             style="width: <?php echo ($loan_totals['total_monthly_payment'] / (($totals['total_expense'] ?? 0) + $loan_totals['total_monthly_payment']) * 100); ?>%"
+                                                             aria-valuenow="<?php echo ($loan_totals['total_monthly_payment'] / (($totals['total_expense'] ?? 0) + $loan_totals['total_monthly_payment']) * 100); ?>" 
+                                                             aria-valuemin="0" 
+                                                             aria-valuemax="100">
+                                                            <?php echo number_format(($loan_totals['total_monthly_payment'] / (($totals['total_expense'] ?? 0) + $loan_totals['total_monthly_payment']) * 100), 1); ?>%
                                                         </div>
                                                     </div>
                                                 </td>

@@ -1,56 +1,257 @@
 /* Modern Dashboard Styles */
 :root {
-    --primary-color: #4361ee;
-    --success-color: #2ecc71;
-    --danger-color: #e74c3c;
-    --info-color: #3498db;
-    --dark-color: #2c3e50;
-    --light-color: #f8f9fa;
-    --border-radius: 10px;
-    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --info-color: #0dcaf0;
+    --text-color: #333;
+    --text-muted: #6c757d;
+    --border-color: #dee2e6;
+    --border-radius: 0.5rem;
+    --card-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --card-shadow-hover: 0 4px 8px rgba(0, 0, 0, 0.15);
     --transition: all 0.3s ease;
 }
 
 body {
-    background-color: #f0f2f5;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa;
+    color: var(--text-color);
+    line-height: 1.6;
 }
 
 /* Card Styles */
 .card {
     border: none;
     border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    transition: var(--transition);
-    margin-bottom: 1.5rem;
+    box-shadow: var(--card-shadow);
+    background: #fff;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+    transition: none !important;
+    transform: none !important;
+    will-change: auto !important;
 }
 
+/* Remove all hover effects from cards */
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: none !important;
+    box-shadow: var(--card-shadow) !important;
+    transition: none !important;
 }
 
+/* Remove all transitions and transforms from card bodies */
+.card-body {
+    padding: 1.5rem;
+    transition: none !important;
+    transform: none !important;
+}
+
+/* Remove all transitions and transforms from card headers */
 .card-header {
     border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
     padding: 1.25rem;
     font-weight: 600;
+    transition: none !important;
+    transform: none !important;
 }
 
-/* Summary Cards */
-.bg-success {
-    background: linear-gradient(45deg, var(--success-color), #27ae60) !important;
+/* Remove all transitions and transforms from buttons in cards */
+.card .btn {
+    transition: none !important;
+    transform: none !important;
 }
 
-.bg-danger {
-    background: linear-gradient(45deg, var(--danger-color), #c0392b) !important;
+.card .btn:hover {
+    transform: none !important;
+    box-shadow: none !important;
 }
 
-.bg-info {
-    background: linear-gradient(45deg, var(--info-color), #2980b9) !important;
+/* Remove all transitions and transforms from summary cards */
+.card.bg-success,
+.card.bg-danger,
+.card.bg-info,
+.card.bg-primary,
+.card.bg-warning {
+    transition: none !important;
+    transform: none !important;
+    will-change: auto !important;
 }
 
-.bg-primary {
-    background: linear-gradient(45deg, var(--primary-color), #3a0ca3) !important;
+.card.bg-success:hover,
+.card.bg-danger:hover,
+.card.bg-info:hover,
+.card.bg-primary:hover,
+.card.bg-warning:hover {
+    transform: none !important;
+    box-shadow: var(--card-shadow) !important;
+}
+
+/* Remove any transform from card body in summary cards */
+.card.bg-success .card-body,
+.card.bg-danger .card-body,
+.card.bg-info .card-body,
+.card.bg-primary .card-body,
+.card.bg-warning .card-body {
+    transform: none !important;
+    transition: none !important;
+}
+
+/* Remove any transform from buttons in summary cards */
+.card.bg-success .btn,
+.card.bg-danger .btn,
+.card.bg-info .btn,
+.card.bg-primary .btn,
+.card.bg-warning .btn {
+    transform: none !important;
+    transition: none !important;
+}
+
+.card.bg-success .btn:hover,
+.card.bg-danger .btn:hover,
+.card.bg-info .btn:hover,
+.card.bg-primary .btn:hover,
+.card.bg-warning .btn:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Remove all transitions from table cells */
+.table td {
+    transition: none !important;
+}
+
+/* Remove all transitions from progress bars */
+.progress-bar {
+    transition: none !important;
+}
+
+/* Remove all transitions from form controls */
+.form-control, .form-select {
+    transition: none !important;
+}
+
+/* Remove all transitions from buttons */
+.btn {
+    transition: none !important;
+}
+
+/* Remove all transitions from alerts */
+.alert {
+    animation: none !important;
+}
+
+/* Remove all transitions from tooltips */
+.tooltip {
+    transition: none !important;
+}
+
+/* Remove all transitions from modals */
+.modal-content {
+    transition: none !important;
+}
+
+/* Remove all transitions from input groups */
+.input-group {
+    transition: none !important;
+}
+
+/* Remove all transitions from table rows */
+.table tbody tr {
+    transition: none !important;
+}
+
+/* Remove all transitions from card headers with gradients */
+.card-header.bg-primary {
+    transition: none !important;
+}
+
+.card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: inherit;
+}
+
+.card-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+/* Table card specific styles */
+.card .table {
+    margin-bottom: 0;
+}
+
+.card .table th {
+    border-top: none;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.card .table td {
+    vertical-align: middle;
+}
+
+/* Modal styles */
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 1.5rem;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+    padding: 1rem 1.5rem;
+}
+
+/* Form styles in cards */
+.card .form-control {
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
+}
+
+.card .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* Alert styles */
+.alert {
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--card-shadow);
+}
+
+/* Progress bar styles */
+.progress {
+    height: 0.5rem;
+    border-radius: var(--border-radius);
+    background-color: var(--border-color);
+    margin: 0.5rem 0;
+}
+
+.progress-bar {
+    border-radius: var(--border-radius);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .card-title {
+        font-size: 0.9rem;
+    }
+    
+    .card-text {
+        font-size: 1.25rem;
+    }
 }
 
 /* Form Controls */
@@ -58,7 +259,6 @@ body {
     border-radius: var(--border-radius);
     border: 1px solid #e0e0e0;
     padding: 0.75rem 1rem;
-    transition: var(--transition);
 }
 
 .form-control:focus, .form-select:focus {
@@ -71,7 +271,6 @@ body {
     border-radius: var(--border-radius);
     padding: 0.75rem 1.5rem;
     font-weight: 500;
-    transition: var(--transition);
 }
 
 .btn-primary {
@@ -130,11 +329,6 @@ body {
     padding: 2rem 1rem;
 }
 
-/* Card Body Spacing */
-.card-body {
-    padding: 1.5rem;
-}
-
 /* Form Labels */
 .form-label {
     font-weight: 500;
@@ -162,7 +356,6 @@ body {
     border-radius: var(--border-radius);
     border: none;
     box-shadow: var(--box-shadow);
-    animation: slideIn 0.3s ease-out;
 }
 
 @keyframes slideIn {
